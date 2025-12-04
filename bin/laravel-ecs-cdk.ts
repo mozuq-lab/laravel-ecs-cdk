@@ -4,6 +4,8 @@ import { LaravelEcsCdkStack } from '../lib/laravel-ecs-cdk-stack';
 
 const app = new cdk.App();
 new LaravelEcsCdkStack(app, 'LaravelEcsCdkStack', {
+  // プロジェクト名（全リソースにProject タグとして適用）
+  projectName: 'laravel-ecs',
   /* If you don't specify 'env', this stack will be environment-agnostic.
    * Account/Region-dependent features and context lookups will not work,
    * but a single synthesized template can be deployed anywhere. */

@@ -6,9 +6,22 @@ import { LaravelServiceConstruct } from './constructs/laravel-service';
 import { LaravelSecretsConstruct } from './constructs/laravel-secrets';
 import { PipelineConstruct } from './constructs/pipeline';
 
+export interface LaravelEcsCdkStackProps extends cdk.StackProps {
+  /**
+   * プロジェクト名（タグ付けに使用）
+   * @default 'laravel-ecs'
+   */
+  projectName?: string;
+}
+
 export class LaravelEcsCdkStack extends cdk.Stack {
-  constructor(scope: Construct, id: string, props?: cdk.StackProps) {
+  constructor(scope: Construct, id: string, props: LaravelEcsCdkStackProps = {}) {
     super(scope, id, props);
+
+    const { projectName = 'laravel-ecs' } = props;
+
+    // 全リソースに共通タグを適用
+    cdk.Tags.of(this).add('Project', projectName);
 
     // ネットワーク層
     const network = new NetworkConstruct(this, 'Network', {
