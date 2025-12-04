@@ -58,6 +58,53 @@ describe('LaravelEcsCdkStack', () => {
     });
   });
 
+  describe('Secrets', () => {
+    test('Secrets Managerシークレットが作成される', () => {
+      template.resourceCountIs('AWS::SecretsManager::Secret', 1);
+    });
+
+    test('シークレットARNが出力される', () => {
+      const outputs = template.findOutputs('AppSecretArn');
+      expect(Object.keys(outputs).length).toBe(1);
+    });
+  });
+
+  describe('Environment Variables', () => {
+    // webコンテナを持つタスク定義を取得するヘルパー
+    const getWebContainerDef = () => {
+      const resources = template.findResources('AWS::ECS::TaskDefinition');
+      for (const taskDef of Object.values(resources)) {
+        const containers = taskDef.Properties?.ContainerDefinitions || [];
+        const webContainer = containers.find((c: { Name: string }) => c.Name === 'web');
+        if (webContainer) return webContainer;
+      }
+      return null;
+    };
+
+    test('タスク定義に本番環境用の環境変数が設定される', () => {
+      const containerDef = getWebContainerDef();
+      expect(containerDef).not.toBeNull();
+
+      // 主要な環境変数が設定されていることを確認
+      const envVars = containerDef.Environment as Array<{ Name: string; Value: string }>;
+      const envMap = Object.fromEntries(envVars.map((e) => [e.Name, e.Value]));
+
+      expect(envMap.APP_ENV).toBe('production');
+      expect(envMap.APP_DEBUG).toBe('false');
+      expect(envMap.LOG_CHANNEL).toBe('stderr');
+    });
+
+    test('タスク定義にシークレットが設定される', () => {
+      const containerDef = getWebContainerDef();
+      expect(containerDef).not.toBeNull();
+
+      // APP_KEYシークレットが設定されていることを確認
+      const secrets = containerDef.Secrets as Array<{ Name: string }>;
+      const secretNames = secrets.map((s) => s.Name);
+      expect(secretNames).toContain('APP_KEY');
+    });
+  });
+
   describe('CI/CD Pipeline', () => {
     test('S3ソースバケットが作成される', () => {
       template.hasResourceProperties('AWS::S3::Bucket', {

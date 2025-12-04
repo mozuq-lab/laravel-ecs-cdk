@@ -11,6 +11,14 @@ export interface LaravelServiceConstructProps {
   cpu?: number;
   memoryLimitMiB?: number;
   desiredCount?: number;
+  /**
+   * 環境変数 (非機密情報)
+   */
+  environment?: { [key: string]: string };
+  /**
+   * シークレット (機密情報)
+   */
+  secrets?: { [key: string]: ecs.Secret };
 }
 
 export class LaravelServiceConstruct extends Construct {
@@ -21,7 +29,14 @@ export class LaravelServiceConstruct extends Construct {
   constructor(scope: Construct, id: string, props: LaravelServiceConstructProps) {
     super(scope, id);
 
-    const { vpc, cpu = 512, memoryLimitMiB = 1024, desiredCount = 1 } = props;
+    const {
+      vpc,
+      cpu = 512,
+      memoryLimitMiB = 1024,
+      desiredCount = 1,
+      environment = {},
+      secrets = {},
+    } = props;
 
     // ECRリポジトリ
     this.repository = new ecr.Repository(this, 'Repository', {
@@ -45,6 +60,8 @@ export class LaravelServiceConstruct extends Construct {
         image: ecs.ContainerImage.fromAsset(path.join(__dirname, '../../laravel')),
         containerPort: 80,
         containerName: 'web', // imagedefinitions.jsonにとって重要
+        environment,
+        secrets,
       },
       memoryLimitMiB,
       publicLoadBalancer: true,
