@@ -37,13 +37,20 @@ RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cac
 COPY nginx/conf.d/app.conf /etc/nginx/conf.d/default.conf
 RUN rm -f /etc/nginx/sites-enabled/default
 
-# Configure Supervisor
+# Configure Supervisor with explicit users
 RUN echo "[supervisord]" > /etc/supervisor/conf.d/supervisord.conf && \
     echo "nodaemon=true" >> /etc/supervisor/conf.d/supervisord.conf && \
+    echo "" >> /etc/supervisor/conf.d/supervisord.conf && \
     echo "[program:php-fpm]" >> /etc/supervisor/conf.d/supervisord.conf && \
     echo "command=docker-php-entrypoint php-fpm" >> /etc/supervisor/conf.d/supervisord.conf && \
+    echo "user=www-data" >> /etc/supervisor/conf.d/supervisord.conf && \
+    echo "autostart=true" >> /etc/supervisor/conf.d/supervisord.conf && \
+    echo "autorestart=true" >> /etc/supervisor/conf.d/supervisord.conf && \
+    echo "" >> /etc/supervisor/conf.d/supervisord.conf && \
     echo "[program:nginx]" >> /etc/supervisor/conf.d/supervisord.conf && \
-    echo "command=nginx -g 'daemon off;'" >> /etc/supervisor/conf.d/supervisord.conf
+    echo "command=nginx -g 'daemon off;'" >> /etc/supervisor/conf.d/supervisord.conf && \
+    echo "autostart=true" >> /etc/supervisor/conf.d/supervisord.conf && \
+    echo "autorestart=true" >> /etc/supervisor/conf.d/supervisord.conf
 
 EXPOSE 80
 
