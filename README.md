@@ -67,10 +67,8 @@ npx aws-cdk deploy
 ソースコードをZip圧縮してS3にアップロードすることで、CodePipelineがトリガーされます。
 
 ```bash
-# LaravelディレクトリをZip圧縮
-cd laravel
-zip -r ../source.zip .
-cd ..
+# ソースZipを作成（vendor/node_modules等は除外される）
+./scripts/create-source-zip.sh
 
 # S3にアップロード (バケット名はCDK出力のものに置き換えてください)
 aws s3 cp source.zip s3://<SourceBucketName>/source.zip
