@@ -80,14 +80,14 @@ export class LaravelEcsCdkStack extends cdk.Stack {
 
     const loadBalancedFargateService = new ecs_patterns.ApplicationLoadBalancedFargateService(this, 'LaravelService', {
       cluster: cluster,
-      cpu: 256,
+      cpu: 512,
       desiredCount: 1,
       taskImageOptions: {
         image: ecs.ContainerImage.fromAsset(path.join(__dirname, '../laravel')), // 初期デプロイメント
         containerPort: 80,
         containerName: 'web', // imagedefinitions.jsonにとって重要
       },
-      memoryLimitMiB: 512,
+      memoryLimitMiB: 1024,
       publicLoadBalancer: true,
     });
 
