@@ -52,7 +52,7 @@ export class LaravelServiceConstruct extends Construct {
 
     // ヘルスチェック
     loadBalancedFargateService.targetGroup.configureHealthCheck({
-      path: '/',
+      path: '/health',
     });
 
     this.service = loadBalancedFargateService.service;

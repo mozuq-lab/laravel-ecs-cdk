@@ -51,7 +51,7 @@ describe('LaravelEcsCdkStack', () => {
 
     test('ターゲットグループが作成される', () => {
       template.hasResourceProperties('AWS::ElasticLoadBalancingV2::TargetGroup', {
-        HealthCheckPath: '/',
+        HealthCheckPath: '/health',
         Port: 80,
         Protocol: 'HTTP',
       });
