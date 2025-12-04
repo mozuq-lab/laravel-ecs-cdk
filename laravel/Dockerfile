@@ -35,6 +35,7 @@ RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cac
 
 # Configure Nginx
 COPY nginx/conf.d/app.conf /etc/nginx/conf.d/default.conf
+RUN rm -f /etc/nginx/sites-enabled/default
 
 # Configure Supervisor
 RUN echo "[supervisord]" > /etc/supervisor/conf.d/supervisord.conf && \
